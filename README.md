@@ -2,7 +2,7 @@
 
 # American Sign Language (ASL) Vision Project
 
-** This repository explores the classification of ASL signs using a baseline CNN and various transfer learning models on an image dataset. **
+**This repository explores the classification of ASL signs using a baseline CNN and various transfer learning models on an image dataset.**
 
 ## Overview
 
