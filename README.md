@@ -30,7 +30,7 @@ The goal of this project is to classify American Sign Language (ASL) images into
 
 Below is a sample of the original dataset before preprocessing.
 
-![Sample Images](Image_1.png)
+![Sample Images](sample_grid.png)
 
 We visualized accuracy and loss curves to evaluate model performance across training epochs.
 
