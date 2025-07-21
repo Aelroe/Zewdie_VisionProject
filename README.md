@@ -81,9 +81,8 @@ We visualized accuracy and loss curves to evaluate model performance across trai
 | MobileNetV2    | ~94%     | 0.98    |
 | EfficientNetB0 | ~96%     | 0.99    |
 
-**ROC Curve – All Models**
-
-![ROC Curve](roc_all_models.png)
+**ROC Curve – Multiclass (Class 1)**  
+![ROC Curve](multiclass_roc_class1.png)
 
 ### Conclusions
 
@@ -109,8 +108,8 @@ We visualized accuracy and loss curves to evaluate model performance across trai
 * `cnn_loss.png`: Loss curve for baseline CNN.
 * `model_accuracy.png`: Validation accuracy comparison across all models.
 * `model_loss.png`: Validation loss comparison across all models.
-* `roc_all_models.png`: ROC curve for all trained models.
-* `Image_1.png`: Sample of preprocessed images.
+* `multiclass_roc_class1.png`: ROC curve for all trained models (Class 1).
+* `sample_grid.png`: Sample of preprocessed images.
 * `UTA-DataScience-Logo.png`: University logo.
 
 ## Software Setup
