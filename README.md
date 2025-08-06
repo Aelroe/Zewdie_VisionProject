@@ -2,142 +2,147 @@
 
 # American Sign Language (ASL) Vision Project
 
-**This repository explores the classification of ASL signs using a baseline CNN and various transfer learning models on an image dataset.**
+This project focuses on building and evaluating deep learning models to classify five American Sign Language (ASL) letters — **E, A, R, I, O** — using transfer learning and convolutional neural networks. All work was done in Google Colab using a custom subset of the Kaggle ASL Alphabet dataset.
+
+---
 
 ## Overview
 
-The goal of this project is to classify American Sign Language (ASL) images into one of two classes. We approached this problem as a binary classification task using convolutional neural networks (CNNs), including transfer learning from MobileNetV2 and EfficientNetB0. Our best-performing model, EfficientNetB0, achieved high accuracy while generalizing well across validation and test datasets.
+We approached this as a **5-class image classification task**, using pretrained models (MobileNetV2 and EfficientNetB0) and applied both baseline and augmented training. We measured performance using accuracy curves, loss curves, and ROC curves per class.
 
-## Summary of Workdone
+---
+
+## Summary of Work
 
 ### Data
 
-* **Input**: RGB images (200x200 pixels) labeled with ASL signs A and B.
-* **Size**: Approximately 7,000+ images.
-* **Split**:
-  * Training: 5,121 images
-  * Validation: 1,463 images
-  * Testing: 732 images
+- **Source**: [ASL Alphabet Dataset (Kaggle)](https://www.kaggle.com/datasets/grassknoted/asl-alphabet)
+- **Classes Used**: `E`, `A`, `R`, `I`, `O` (5 most common letters)
+- **Images per Class**: 80 images (manually capped)
+- **Split**:
+  - 56 training images
+  - 24 validation images
 
-#### Preprocessing / Clean up
+### Preprocessing
 
-* Resized images to 200x200 pixels.
-* Applied normalization to scale pixel values.
-* One-hot encoded labels for binary classification.
-* Created data generators to augment training data (flipping, rotation, zooming, etc.).
+- Resized all images to **224x224** pixels
+- Normalized pixel values
+- Created training and validation directories
+- Used `ImageDataGenerator` for image loading, and applied augmentation in later steps
 
-#### Data Visualization
+### Visualization
 
-Below is a sample of the original dataset before preprocessing.
+- Displayed balanced class distribution (56 train / 24 val each)
+- Sample image grid before and after augmentation
 
 ![Sample Images](sample_grid.png)
 
-We visualized accuracy and loss curves to evaluate model performance across training epochs.
+---
 
-### Problem Formulation
+## Models
 
-* **Input**: 200x200x3 image tensor.
-* **Output**: Binary label (one-hot encoded).
-* **Models**:
-  * Baseline CNN (custom architecture)
-  * CNN with Image Augmentation
-  * MobileNetV2
-  * EfficientNetB0
-* **Loss Function**: Binary Crossentropy
-* **Optimizer**: Adam
-* **Batch Size**: 32
-* **Epochs**: 20
+### 1. **Baseline Transfer Learning (MobileNetV2)**
 
-### Training
+- MobileNetV2 with frozen base layers
+- Added global average pooling + dense layers
+- Trained for 10 epochs on raw images
 
-* **Environment**: Google Colab, GPU-enabled runtime.
-* **Time**: Each model took ~3–7 minutes to train.
-* **Early Stopping**: Used to prevent overfitting.
-* **Difficulties**: Balancing accuracy and overfitting on baseline models; resolved via data augmentation and transfer learning.
+### 2. **Augmented Training (MobileNetV2)**
 
-**Training Curves:**
+- Same architecture, but added:
+  - Rotation
+  - Width/height shift
+  - Zoom
+  - Horizontal flip
+- Helped improve generalization
 
-- Baseline CNN Validation Accuracy  
-  ![CNN Accuracy](cnn_accuracy.png)
+### 3. **EfficientNetB0**
 
-- Baseline CNN Validation Loss  
-  ![CNN Loss](cnn_loss.png)
+- Loaded EfficientNetB0 weights
+- Same classification head as above
+- Slower training, used for comparison
 
-- Accuracy Comparison (All Models)  
-  ![All Accuracy](model_accuracy.png)
+---
 
-- Loss Comparison (All Models)  
-  ![All Loss](model_loss.png)
+## Training & Evaluation
 
-### Performance Comparison
+- **Environment**: Google Colab with GPU runtime
+- **Loss**: `categorical_crossentropy`
+- **Optimizer**: Adam
+- **Epochs**: 10
+- **Batch size**: 16
 
-* **Metrics**: Validation Accuracy, ROC AUC
-* **Results**:
+### Accuracy and Loss
 
-| Model          | Accuracy | ROC AUC |
-|----------------|----------|---------|
-| Baseline CNN   | ~88%     | 0.95    |
-| Augmented CNN  | ~91%     | 0.97    |
-| MobileNetV2    | ~94%     | 0.98    |
-| EfficientNetB0 | ~96%     | 0.99    |
+Each model's training and validation curves were plotted and compared.
 
-**ROC Curve – Multiclass (Class 1)**  
+![CNN Accuracy](cnn_accuracy.png)  
+![CNN Loss](cnn_loss.png)  
+![All Model Accuracy](model_accuracy.png)  
+![All Model Loss](model_loss.png)
+
+### ROC Curve (Multiclass – Class 1)
+
+We used `label_binarize` and `roc_curve` from scikit-learn to evaluate ROC per class.
+
 ![ROC Curve](multiclass_roc_class1.png)
 
-### Conclusions
+---
 
-* EfficientNetB0 achieved the best performance and generalization.
-* Transfer learning significantly improved results compared to baseline CNNs.
+## Results Summary
 
-### Future Work
+| Model               | Notes                  | Accuracy (Val) | ROC AUC (Class 1) |
+|---------------------|------------------------|----------------|-------------------|
+| Baseline MobileNetV2 | No augmentation        | High           | ~0.51             |
+| Augmented MobileNetV2 | With data augmentation | Slightly improved | ~0.44         |
+| EfficientNetB0      | Transfer learning only | Slower training | ~0.41             |
 
-* Expand to full ASL alphabet (A–Z) or real-time gesture recognition.
-* Explore ensemble learning for multi-model consensus.
-* Deploy as a web app or mobile tool.
+---
 
-## How to Reproduce Results
+## Conclusion
 
-* Open `VisionProject_Zewdie.ipynb` in Google Colab.
-* Run all cells sequentially, ensuring GPU is enabled.
-* Download the ASL dataset and follow preprocessing as defined in the notebook.
+- Baseline MobileNetV2 performed the best out of the three.
+- Augmentation provided minor generalization benefits.
+- EfficientNetB0 struggled to converge with limited data in 10 epochs.
+- All models were evaluated with accuracy, loss, and ROC metrics.
 
-## Overview of files in repository
+---
 
-* `VisionProject_Zewdie.ipynb`: Full notebook with training, evaluation, and visualizations.
-* `cnn_accuracy.png`: Accuracy curve for baseline CNN.
-* `cnn_loss.png`: Loss curve for baseline CNN.
-* `model_accuracy.png`: Validation accuracy comparison across all models.
-* `model_loss.png`: Validation loss comparison across all models.
-* `multiclass_roc_class1.png`: ROC curve for all trained models (Class 1).
-* `sample_grid.png`: Sample of preprocessed images.
-* `UTA-DataScience-Logo.png`: University logo.
+## How to Reproduce
 
-## Software Setup
+1. Open `VisionProject_Zewdie.ipynb` in Google Colab  
+2. Download the ASL dataset from Kaggle  
+3. Filter to keep only E, A, R, I, O (80 per class)  
+4. Run all cells step-by-step  
+5. Visualizations are saved automatically using `plt.savefig()`
 
-* Python 3.10+
-* TensorFlow 2.13+
-* scikit-learn
-* NumPy, pandas, matplotlib
-* Google Colab or any GPU-enabled environment
+---
 
-## Data
+## Files in Repository
 
-* Dataset: [ASL Alphabet Dataset](https://www.kaggle.com/datasets/grassknoted/asl-alphabet)
-* Download and extract under your working directory.
-* Dataset is pre-separated by folder/class name.
+- `VisionProject_Zewdie.ipynb` – Complete workflow
+- `cnn_accuracy.png` – Baseline model accuracy
+- `cnn_loss.png` – Baseline model loss
+- `model_accuracy.png` – Accuracy comparison (all models)
+- `model_loss.png` – Loss comparison (all models)
+- `multiclass_roc_class1.png` – ROC for class 1 (from final models)
+- `sample_grid.png` – Example training images (E, A, R, I, O)
+- `UTA-DataScience-Logo.png` – University branding
 
-## Training
+---
 
-* Run each model block (baseline, augmented, transfer models) in the notebook.
-* Visualizations are auto-generated and saved using `plt.savefig()`.
+## Software & Libraries
 
-### Performance Evaluation
+- Python 3.10+
+- TensorFlow 2.13+
+- scikit-learn
+- NumPy, matplotlib, pandas
+- Google Colab (GPU runtime)
 
-* Run the final ROC plotting cell.
-* Compare model metrics printed in the summary table.
+---
 
 ## Citations
 
-* ASL Dataset by grassknoted on Kaggle: https://www.kaggle.com/datasets/grassknoted/asl-alphabet
-* TensorFlow documentation
-* Keras tutorials on Transfer Learning
+- [ASL Alphabet Dataset – Kaggle](https://www.kaggle.com/datasets/grassknoted/asl-alphabet)
+- TensorFlow and Keras Documentation
+- scikit-learn ROC/metrics tools
